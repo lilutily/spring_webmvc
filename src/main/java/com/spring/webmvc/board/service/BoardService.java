@@ -20,28 +20,44 @@ public class BoardService {
     private final BoardRepository repository;
     // @RequiredArgsConstructor 붙이면 안써도됨
     // 그래서 생성자 주입을 함
-//    @Autowired
-//    public BoardService(BoardRepository repository) {
-//        this.repository = repository;
-//    }
+    //    @Autowired
+    //    public BoardService(BoardRepository repository) {
+    //        this.repository = repository;
+    //    }
 
     // 전체 조회 중간처리
     public List<Board> getList() {
         List<Board> boardList = repository.findAll();
 
-
         // 게시물 제목 줄임 처리
         // 만약 글제목이 6글자 이상이면 6글자 까지 보여주고 뒤에 ...처리
         // 게시물 제목 줄임 처리
         // 만약에 글제목이 6글자 이상이면 6글자까지만 보여주고 뒤에 ... 처리
-        for (Board b : boardList) {
-            subStringTitle(b); // ctrl alt m 눌러서 빼줌
-
-            // 날짜 포맷팅 처리
-            convertDateFormat(b);
-        }
+        processBoardList(boardList);
 
         return boardList;
+    }
+
+    private void processBoardList(List<Board> boardList) {
+        for (Board b : boardList) {
+            subStringTitle(b); // ctrl alt m 눌러서 빼줌
+            // 날짜 포맷팅 처리
+            convertDateFormat(b);
+            // 신규게시물 new 마치 처리 (10분이내 작성된 게시물)
+            isNewArticle(b);
+
+        }
+    }
+
+    private static void isNewArticle(Board b) {
+        long regDate = b.getRegDate().getTime(); // 게시물 작성시간(밀리초)
+        long nowDate =  System.currentTimeMillis(); // 현재시간(밀리초)
+
+        long diff = nowDate - regDate; // 작성후 지난 시간(밀리초)
+        long limit = 10*60*1000; // 10분을 밀리초로 변환
+        if(diff <= limit) {
+            b.setNewArticle(true);
+        }
     }
 
     private void convertDateFormat(Board b) {
