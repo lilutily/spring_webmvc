@@ -7,6 +7,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.util.List;
@@ -55,10 +56,12 @@ public class BoardController {
 
         // 게시물 등록 요청
         @PostMapping("/write")
-        public String write (Board board) {
+        // Model로 하면 중간에 request가 죽어버리기 때문에 RedirectAttribute 사용
+        public String write (Board board, RedirectAttributes ra) {
             log.info("/board/write POST {}", board);
             // db에 넣어주고
             boolean flag=service.insert(board);
+            ra.addFlashAttribute("msg", "insert-success");
             // 갱신된 board/list를 가져와야되니까 redirect - 이미 위에서 한번 요청했으니까 재요청하는부분
             return flag ? "redirect:/board/list" : "redirect:/";
         }
