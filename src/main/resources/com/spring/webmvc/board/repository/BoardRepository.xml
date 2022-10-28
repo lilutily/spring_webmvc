@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.webmvc.board.repository.BoardRepository">
+
+    <!--  sql과 java의 이름관례 차이에서 오는 매핑을 맞춰줌  -->
+    <resultMap id="boardMap" type="com.spring.webmvc.board.domain.Board">
+        <id property="boardNo" column="board_no"/>
+        <result property="viewCnt" column="view_cnt"/>
+        <result property="regDate" column="reg_date"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="boardMap">
+        select * from tbl_board order by board_no DESC
+    </select>
+    <select id="findOne" resultMap="boardMap">
+        select * from tbl_board where board_no=#{boardNo}
+    </select>
+    <insert id="save">
+        insert into tbl_board(writer, title, content)
+        values(#{writer}, #{title},#{content})
+<!--    #{getwriter}, #{gettitle},#{getcontent}   getter 안만들면안됨 -->
+    </insert>
+    <delete id="remove">
+        delete from tbl_board where board_no=#{boardNo}
+    </delete>
+    <update id="modify">
+        update tbl_board set title=#{title}, writer=#{writer}, content=#{content}
+        where board_no=#{boardNo}
+    </update>
+</mapper>
